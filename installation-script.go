@@ -81,6 +81,10 @@ func GetUserInput() Config {
 	airflowPort, _ := reader.ReadString('\n')
 	airflowPort = trimNewline(airflowPort)
 
+	fmt.Print("Enter Airflow Webserver port (e.g., 8081): ")
+	airflowWebPort, _ := reader.ReadString('\n')
+	airflowWebPort = trimNewline(airflowWebPort)
+
 	fmt.Print("Enter Airflow logs directory (e.g., /opt/airflow/logs): ")
 	logDir, _ := reader.ReadString('\n')
 	logDir = trimNewline(logDir)
@@ -105,6 +109,7 @@ func GetUserInput() Config {
 		AirflowEnv:         airflowHome + "/airflow_env",
 		AirflowUser:        airflowUser,
 		AirflowPort:        airflowPort,
+		AirflowWebPort:     airflowWebPort,
 		LogDir:             logDir,
 		DBType:             dbType,
 		DBUser:             dbUser,
