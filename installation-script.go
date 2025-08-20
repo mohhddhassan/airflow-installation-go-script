@@ -17,7 +17,8 @@ type Config struct {
 	AirflowHome        string
 	AirflowEnv         string
 	AirflowUser        string
-	AirflowPort        string
+	AirflowApiPort     string
+	AirflowWebPort	   string
 	LogDir             string
 	DBType             string
 	DBUser             string
@@ -79,7 +80,7 @@ func GetUserInput() Config {
 
 	fmt.Print("Enter Airflow API server port (e.g., 8080): ")
 	airflowPort, _ := reader.ReadString('\n')
-	airflowPort = trimNewline(airflowPort)
+	airflowPort = trimNewline(airflowApiPort)
 
 	fmt.Print("Enter Airflow Webserver port (e.g., 8081): ")
 	airflowWebPort, _ := reader.ReadString('\n')
@@ -108,7 +109,7 @@ func GetUserInput() Config {
 		AirflowHome:        airflowHome,
 		AirflowEnv:         airflowHome + "/airflow_env",
 		AirflowUser:        airflowUser,
-		AirflowPort:        airflowPort,
+		AirflowApiPort:     airflowApiPort,
 		AirflowWebPort:     airflowWebPort,
 		LogDir:             logDir,
 		DBType:             dbType,
