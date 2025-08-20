@@ -181,7 +181,7 @@ files = {{.SupervisorDir}}/*.conf
 	// Airflow config
 	airflowTemplate := `
 [program:airflow-apiserver]
-command={{.AirflowEnv}}/bin/airflow api-server --port {{.AirflowPort}}
+command={{.AirflowEnv}}/bin/airflow api-server --port {{.AirflowApiPort}}
 directory={{.AirflowHome}}
 user={{.AirflowUser}}
 autostart=true
@@ -190,6 +190,18 @@ startsecs=10
 stopwaitsecs=20
 stdout_logfile={{.LogDir}}/airflow-apiserver.out.log
 stderr_logfile={{.LogDir}}/airflow-apiserver.err.log
+environment=AIRFLOW_HOME="{{.AirflowHome}}"
+
+[program:airflow-webserver]
+command={{.AirflowEnv}}/bin/airflow webserver --port {{.AirflowWebPort}}
+directory={{.AirflowHome}}
+user={{.AirflowUser}}
+autostart=true
+autorestart=true
+startsecs=10
+stopwaitsecs=20
+stdout_logfile={{.LogDir}}/airflow-webserver.out.log
+stderr_logfile={{.LogDir}}/airflow-webserver.err.log
 environment=AIRFLOW_HOME="{{.AirflowHome}}"
 
 [program:airflow-scheduler]
