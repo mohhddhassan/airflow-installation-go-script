@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: airflow_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: airflow_db
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
