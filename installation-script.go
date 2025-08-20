@@ -110,23 +110,35 @@ func GetUserInput() Config {
 		DBUser:             dbUser,
 		DBPassword:         dbPassword,
 		AirflowVer:         "3.0.3",
-		PythonVer:          "3.11",
+		PythonVer:          "3.12",
 	}
 }
 
 func SetupDatabase(cfg Config) {
 	if cfg.DBType == "mysql" {
 		fmt.Println("Setting up MySQL DB and user...")
-		runCmd("sudo", "mysql", "-e",
-			fmt.Sprintf("CREATE DATABASE IF NOT EXISTS airflow_db; GRANT ALL PRIVILEGES ON airflow_db.* TO '%s'@'localhost' IDENTIFIED BY '%s'; FLUSH PRIVILEGES;", cfg.DBUser, cfg.DBPassword))
+		runCmd("mysql", "-h", "127.0.0.1", "-P", "3306", "-u", "root", "-p"+cfg.DBPassword,
+			"-e", "CREATE DATABASE IF NOT EXISTS airflow_db;")
+		runCmd("mysql", "-h", "127.0.0.1", "-P", "3306", "-u", "root", "-p"+cfg.DBPassword,
+			"-e", fmt.Sprintf("CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';", cfg.DBUser, cfg.DBPassword))
+		runCmd("mysql", "-h", "127.0.0.1", "-P", "3306", "-u", "root", "-p"+cfg.DBPassword,
+			"-e", fmt.Sprintf("GRANT ALL PRIVILEGES ON airflow_db.* TO '%s'@'%%'; FLUSH PRIVILEGES;", cfg.DBUser))
 	} else if cfg.DBType == "postgresql" {
-		fmt.Println("PostgreSQL setup not implemented yet")
+		fmt.Println("Setting up PostgreSQL DB and user...")
+		runCmd("psql", "-h", "127.0.0.1", "-p", "5432", "-U", "postgres", "-c",
+			"CREATE DATABASE airflow_db;")
+		runCmd("psql", "-h", "127.0.0.1", "-p", "5432", "-U", "postgres", "-c",
+			fmt.Sprintf("CREATE USER %s WITH ENCRYPTED PASSWORD '%s';", cfg.DBUser, cfg.DBPassword))
+		runCmd("psql", "-h", "127.0.0.1", "-p", "5432", "-U", "postgres", "-c",
+			fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE airflow_db TO %s;", cfg.DBUser))
+	} else {
+		fmt.Println("Unsupported DB type")
 	}
 }
 
 func SetupPythonEnv(cfg Config) {
 	fmt.Println("Setting up Python virtual environment and installing Airflow...")
-	runCmd("python3", "-m", "venv", cfg.AirflowEnv)
+	runCmd("/usr/local/bin/python3.12", "-m", "venv", cfg.AirflowEnv)
 	runCmd("bash", "-c", fmt.Sprintf("source %s/bin/activate && pip install --upgrade pip", cfg.AirflowEnv))
 
 	os.Setenv("AIRFLOW_HOME", cfg.AirflowHome)
